@@ -1,5 +1,5 @@
 import numpy as np
-from . import fun_implement as fd
+from . import object_detection
 import cv2
 
 from django.shortcuts import render
@@ -26,9 +26,10 @@ class Image(TemplateView):
             obj = form.save()
             print(obj.name)
             print(obj.image.url)
-            outputFile,frame=fd.dummy(obj.image.url)
+            outputFile,frame=object_detection.detect(obj.image.url)
             #outputFile=os.path.basename(outputFile)
             obj.detected_img = outputFile
+            print(obj.detected_img)
             obj.save()
             return HttpResponseRedirect(reverse_lazy('image_display', kwargs={'pk': obj.id}))
 
@@ -48,15 +49,3 @@ def deleteimg(request,pk):
         model = Image_model.objects.get(pk=pk)
         model.delete()
         return HttpResponseRedirect(reverse_lazy('home'))
-
-class ImageDisplay(DetailView):
-    model = Image_model
-    template_name = 'image_display.html'
-    context_object_name = 'context'
-
-def deleteimg(request,pk):
-    if request.method=='POST':
-        model = Image_model.objects.get(pk=pk)
-        model.delete()
-        return HttpResponseRedirect(reverse_lazy('home'))
-
